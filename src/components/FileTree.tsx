@@ -7,6 +7,8 @@ interface FileTreeProps {
   onSelect: (node: FileNode) => void;
   defaultExpanded?: boolean;
   depth?: number;
+  /** When true, all directories are shown as expanded (used during filtering). */
+  forceExpand?: boolean;
 }
 
 export function FileTree({
@@ -15,8 +17,10 @@ export function FileTree({
   onSelect,
   defaultExpanded = false,
   depth = 0,
+  forceExpand = false,
 }: FileTreeProps) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const effectiveExpanded = forceExpand || isExpanded;
   const indent = depth * 14;
 
   if (node.kind === 'file') {
@@ -38,7 +42,7 @@ export function FileTree({
   }
 
   return (
-    <div className="tree-directory" role="treeitem" aria-expanded={isExpanded}>
+    <div className="tree-directory" role="treeitem" aria-expanded={effectiveExpanded}>
       <div
         className="tree-item tree-dir-row"
         style={{ paddingLeft: `${indent + 6}px` }}
@@ -46,11 +50,11 @@ export function FileTree({
         tabIndex={0}
         onKeyDown={(e) => e.key === 'Enter' && setIsExpanded((prev) => !prev)}
       >
-        <span className={`tree-chevron${isExpanded ? ' tree-chevron--open' : ''}`} aria-hidden="true" />
+        <span className={`tree-chevron${effectiveExpanded ? ' tree-chevron--open' : ''}`} aria-hidden="true" />
         <span className="tree-icon tree-icon--folder" aria-hidden="true" />
         <span className="tree-name">{node.name}</span>
       </div>
-      {isExpanded && node.children && (
+      {effectiveExpanded && node.children && (
         <div role="group">
           {node.children.map((child) => (
             <FileTree
@@ -59,6 +63,7 @@ export function FileTree({
               selectedPath={selectedPath}
               onSelect={onSelect}
               depth={depth + 1}
+              forceExpand={forceExpand}
             />
           ))}
         </div>

@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { FolderPicker } from './components/FolderPicker';
 import { FileTree } from './components/FileTree';
 import { FileDetail } from './components/FileDetail';
 import { buildFileTree } from './lib/fileSystem';
+import { filterTree } from './lib/filterTree';
 import type { FileNode } from './lib/types';
 import './App.css';
 
@@ -11,11 +12,21 @@ export default function App() {
   const [selectedFile, setSelectedFile] = useState<FileNode | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [filterQuery, setFilterQuery] = useState('');
+
+  const isFiltering = filterQuery.trim().length > 0;
+
+  const displayedTree = useMemo(() => {
+    const q = filterQuery.trim();
+    if (!rootNode || !q) return rootNode;
+    return filterTree(rootNode, q);
+  }, [rootNode, filterQuery]);
 
   async function handleSelectFolder() {
     try {
       setIsLoading(true);
       setError(null);
+      setFilterQuery('');
       const dirHandle = await window.showDirectoryPicker();
       const tree = await buildFileTree(dirHandle);
       setRootNode(tree);
@@ -59,13 +70,41 @@ export default function App() {
 
       {rootNode && !isLoading && (
         <div className="app-browser">
-          <aside className="app-tree" role="tree" aria-label="File tree">
-            <FileTree
-              node={rootNode}
-              selectedPath={selectedFile?.path ?? null}
-              onSelect={setSelectedFile}
-              defaultExpanded
-            />
+          <aside className="app-sidebar">
+            <div className="tree-filter">
+              <div className="tree-filter__wrapper">
+                <input
+                  className="tree-filter__input"
+                  type="text"
+                  placeholder="Filter files and folders..."
+                  value={filterQuery}
+                  onChange={(e) => setFilterQuery(e.target.value)}
+                  aria-label="Filter files and folders"
+                />
+                {filterQuery && (
+                  <button
+                    className="tree-filter__clear"
+                    onClick={() => setFilterQuery('')}
+                    aria-label="Clear filter"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            </div>
+            <div className="app-tree" role="tree" aria-label="File tree">
+              {displayedTree ? (
+                <FileTree
+                  node={displayedTree}
+                  selectedPath={selectedFile?.path ?? null}
+                  onSelect={setSelectedFile}
+                  defaultExpanded
+                  forceExpand={isFiltering}
+                />
+              ) : (
+                <p className="tree-no-match">No matching files or folders</p>
+              )}
+            </div>
           </aside>
           <main className="app-detail">
             {selectedFile ? (

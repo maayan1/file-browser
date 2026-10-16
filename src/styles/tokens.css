@@ -1,26 +1,31 @@
 :root {
-  /* Colors — background */
-  --color-bg-primary:   #1a1b1e;
-  --color-bg-secondary: #25262b;
-  --color-bg-tertiary:  #2c2e33;
-  --color-bg-hover:     #373a40;
-  --color-bg-selected:  #1c3a6e;
+  /* Colors — background (dark navy) */
+  --color-bg-primary:   #0d1117;
+  --color-bg-secondary: #161b22;
+  --color-bg-tertiary:  #1c2128;
+  --color-bg-hover:     #21262d;
+  --color-bg-selected:  #1a3a5c;
 
   /* Colors — text */
-  --color-text-primary:   #e9ecef;
-  --color-text-secondary: #adb5bd;
-  --color-text-muted:     #868e96;
+  --color-text-primary:   #f0f6fc;
+  --color-text-secondary: #8b949e;
+  --color-text-muted:     #6e7681;
 
   /* Colors — structural */
-  --color-border:       #373a40;
-  --color-accent:       #4dabf7;
-  --color-accent-hover: #74c0fc;
-  --color-error-bg:     #3b1111;
-  --color-error-text:   #ff8080;
+  --color-border:          #30363d;
+  --color-accent:          #58a6ff;
+  --color-accent-hover:    #79c0ff;
+  --color-accent-purple:   #bc8cff;
+  --color-error-bg:        #3b1111;
+  --color-error-text:      #ff8080;
+
+  /* Colors — gradients */
+  --gradient-heading:      linear-gradient(135deg, #58a6ff 0%, #bc8cff 100%);
+  --gradient-button:       linear-gradient(135deg, #1d6feb 0%, #7c3aed 100%);
 
   /* Icons */
-  --color-icon-folder: #fcc419;
-  --color-icon-file:   #74c0fc;
+  --color-icon-folder: #e3b341;
+  --color-icon-file:   #58a6ff;
 
   /* Spacing */
   --space-xs:  4px;
@@ -29,14 +34,36 @@
   --space-lg:  24px;
   --space-xl:  32px;
 
-  /* Typography */
-  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono:   'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+  /* Typography — font families */
+  --font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono:   'SF Mono', 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+
+  /* Typography — sizes */
   --font-size-xs:  11px;
-  --font-size-sm:  12px;
+  --font-size-sm:  13px;
   --font-size-md:  14px;
   --font-size-lg:  16px;
   --font-size-xl:  20px;
+  --font-size-2xl: 24px;
+
+  /* Typography — weights */
+  --font-weight-normal:    400;
+  --font-weight-medium:    500;
+  --font-weight-semibold:  600;
+  --font-weight-bold:      700;
+  --font-weight-extrabold: 800;
+
+  /* Typography — line heights */
+  --line-height-tight:   1.2;
+  --line-height-snug:    1.4;
+  --line-height-normal:  1.5;
+  --line-height-relaxed: 1.7;
+
+  /* Typography — letter spacing */
+  --letter-spacing-tight:  -0.02em;
+  --letter-spacing-normal:  0em;
+  --letter-spacing-wide:    0.05em;
+  --letter-spacing-wider:   0.10em;
 
   /* Border radius */
   --radius-sm: 3px;
