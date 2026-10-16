@@ -210,6 +210,23 @@ body {
   min-width: 0;
 }
 
+/* Badge shown after the file name (e.g. "Large file") */
+.tree-badge {
+  flex-shrink: 0;
+  padding: 0 var(--space-xs);
+  border: 1px solid var(--color-icon-folder);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-snug);
+  white-space: nowrap;
+}
+
+.tree-badge--large {
+  color: var(--color-icon-folder);
+  background: var(--color-bg-tertiary);
+}
+
 /* Tree chevron (CSS-only arrow) */
 .tree-chevron {
   display: inline-flex;

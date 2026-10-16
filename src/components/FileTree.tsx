@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { FileNode } from '../lib/types';
+import { isLargeFile } from '../lib/fileSize';
 
 interface FileTreeProps {
   node: FileNode;
@@ -37,6 +38,11 @@ export function FileTree({
       >
         <span className="tree-icon tree-icon--file" aria-hidden="true" />
         <span className="tree-name">{node.name}</span>
+        {isLargeFile(node) && (
+          <span className="tree-badge tree-badge--large" title="Larger than 10 MiB">
+            Large file
+          </span>
+        )}
       </div>
     );
   }
