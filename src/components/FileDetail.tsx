@@ -1,5 +1,6 @@
 import type { FileNode } from '../lib/types';
 import { formatFileSize, formatDate, getFileTypeLabel, isImageFile } from '../lib/fileUtils';
+import { formatRelativeTime } from '../lib/relativeTime';
 import { ImagePreview } from './ImagePreview';
 
 interface FileDetailProps {
@@ -8,6 +9,7 @@ interface FileDetailProps {
 
 export function FileDetail({ node }: FileDetailProps) {
   const showPreview = node.mimeType != null && isImageFile(node.mimeType) && node.handle != null;
+  const relativeTime = node.lastModified !== undefined ? formatRelativeTime(node.lastModified) : null;
 
   return (
     <div className="file-detail">
@@ -37,7 +39,10 @@ export function FileDetail({ node }: FileDetailProps) {
           {node.lastModified !== undefined && (
             <div className="detail-row">
               <dt>Last Modified</dt>
-              <dd>{formatDate(node.lastModified)}</dd>
+              <dd>
+                {formatDate(node.lastModified)}
+                {relativeTime && <span className="detail-relative-time">{relativeTime}</span>}
+              </dd>
             </div>
           )}
           <div className="detail-row">

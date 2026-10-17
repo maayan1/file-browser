@@ -364,6 +364,11 @@ body {
   min-width: 0;
 }
 
+.detail-relative-time {
+  margin-left: var(--space-sm);
+  color: var(--color-text-muted);
+}
+
 .detail-path {
   font-family: var(--font-mono);
   font-size: var(--font-size-xs);
