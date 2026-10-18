@@ -4,6 +4,7 @@ import { FileTree } from './components/FileTree';
 import { FileDetail } from './components/FileDetail';
 import { buildFileTree } from './lib/fileSystem';
 import { filterTree } from './lib/filterTree';
+import { collectDirectoryPaths, togglePath } from './lib/treeExpansion';
 import type { FileNode } from './lib/types';
 import './App.css';
 
@@ -13,8 +14,21 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filterQuery, setFilterQuery] = useState('');
+  const [expandedPaths, setExpandedPaths] = useState<ReadonlySet<string>>(() => new Set());
 
   const isFiltering = filterQuery.trim().length > 0;
+
+  function handleToggle(path: string) {
+    setExpandedPaths((prev) => togglePath(prev, path));
+  }
+
+  function handleExpandAll() {
+    setExpandedPaths(collectDirectoryPaths(rootNode));
+  }
+
+  function handleCollapseAll() {
+    setExpandedPaths(new Set());
+  }
 
   const displayedTree = useMemo(() => {
     const q = filterQuery.trim();
@@ -30,6 +44,7 @@ export default function App() {
       const dirHandle = await window.showDirectoryPicker();
       const tree = await buildFileTree(dirHandle);
       setRootNode(tree);
+      setExpandedPaths(new Set([tree.path]));
       setSelectedFile(null);
     } catch (err) {
       if (err instanceof Error && err.name !== 'AbortError') {
@@ -91,6 +106,26 @@ export default function App() {
                   </button>
                 )}
               </div>
+              <div className="tree-actions">
+                <button
+                  type="button"
+                  className="tree-actions__button"
+                  onClick={handleExpandAll}
+                  disabled={isFiltering}
+                  title={isFiltering ? 'Clear the filter to expand or collapse folders' : undefined}
+                >
+                  Expand All
+                </button>
+                <button
+                  type="button"
+                  className="tree-actions__button"
+                  onClick={handleCollapseAll}
+                  disabled={isFiltering}
+                  title={isFiltering ? 'Clear the filter to expand or collapse folders' : undefined}
+                >
+                  Collapse All
+                </button>
+              </div>
             </div>
             <div className="app-tree" role="tree" aria-label="File tree">
               {displayedTree ? (
@@ -98,7 +133,8 @@ export default function App() {
                   node={displayedTree}
                   selectedPath={selectedFile?.path ?? null}
                   onSelect={setSelectedFile}
-                  defaultExpanded
+                  expandedPaths={expandedPaths}
+                  onToggle={handleToggle}
                   forceExpand={isFiltering}
                 />
               ) : (

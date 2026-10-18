@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import type { FileNode } from '../lib/types';
 import { isLargeFile } from '../lib/fileSize';
 
@@ -6,7 +5,10 @@ interface FileTreeProps {
   node: FileNode;
   selectedPath: string | null;
   onSelect: (node: FileNode) => void;
-  defaultExpanded?: boolean;
+  /** Paths of the directories that are open. Owned by the parent. */
+  expandedPaths: ReadonlySet<string>;
+  /** Called with a directory's path when its row is clicked or Enter is pressed. */
+  onToggle: (path: string) => void;
   depth?: number;
   /** When true, all directories are shown as expanded (used during filtering). */
   forceExpand?: boolean;
@@ -16,12 +18,12 @@ export function FileTree({
   node,
   selectedPath,
   onSelect,
-  defaultExpanded = false,
+  expandedPaths,
+  onToggle,
   depth = 0,
   forceExpand = false,
 }: FileTreeProps) {
-  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
-  const effectiveExpanded = forceExpand || isExpanded;
+  const effectiveExpanded = forceExpand || expandedPaths.has(node.path);
   const indent = depth * 14;
 
   if (node.kind === 'file') {
@@ -52,9 +54,9 @@ export function FileTree({
       <div
         className="tree-item tree-dir-row"
         style={{ paddingLeft: `${indent + 6}px` }}
-        onClick={() => setIsExpanded((prev) => !prev)}
+        onClick={() => onToggle(node.path)}
         tabIndex={0}
-        onKeyDown={(e) => e.key === 'Enter' && setIsExpanded((prev) => !prev)}
+        onKeyDown={(e) => e.key === 'Enter' && onToggle(node.path)}
       >
         <span className={`tree-chevron${effectiveExpanded ? ' tree-chevron--open' : ''}`} aria-hidden="true" />
         <span className="tree-icon tree-icon--folder" aria-hidden="true" />
@@ -68,6 +70,8 @@ export function FileTree({
               node={child}
               selectedPath={selectedPath}
               onSelect={onSelect}
+              expandedPaths={expandedPaths}
+              onToggle={onToggle}
               depth={depth + 1}
               forceExpand={forceExpand}
             />

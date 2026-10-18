@@ -28,7 +28,14 @@ let root: Root;
 function render(node: FileNode, onSelect: (n: FileNode) => void = () => {}) {
   act(() => {
     root.render(
-      <FileTree node={node} selectedPath={null} onSelect={onSelect} defaultExpanded forceExpand />,
+      <FileTree
+        node={node}
+        selectedPath={null}
+        onSelect={onSelect}
+        expandedPaths={new Set()}
+        onToggle={() => {}}
+        forceExpand
+      />,
     );
   });
 }
@@ -96,5 +103,81 @@ describe('FileTree large file badge', () => {
     });
 
     expect(selected).toEqual(['root/video.mp4']);
+  });
+});
+
+describe('FileTree controlled expansion', () => {
+  const tree = dir('root', [
+    dir('root/docs', [dir('root/docs/2026', [file('root/docs/2026/plan.md', 10)])]),
+    file('root/readme.txt', 10),
+  ]);
+
+  function renderExpanded(expandedPaths: ReadonlySet<string>, onToggle: (path: string) => void = () => {}) {
+    act(() => {
+      root.render(
+        <FileTree
+          node={tree}
+          selectedPath={null}
+          onSelect={() => {}}
+          expandedPaths={expandedPaths}
+          onToggle={onToggle}
+        />,
+      );
+    });
+  }
+
+  function visibleNames(): string[] {
+    return Array.from(container.querySelectorAll('.tree-name')).map((el) => el.textContent ?? '');
+  }
+
+  it('shows only the root row when no folder is expanded', () => {
+    renderExpanded(new Set());
+
+    expect(visibleNames()).toEqual(['root']);
+    expect(rowFor('root').parentElement!.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('opens exactly the folders listed in expandedPaths, including nested ones', () => {
+    renderExpanded(new Set(['root', 'root/docs', 'root/docs/2026']));
+
+    expect(visibleNames()).toEqual(['root', 'docs', '2026', 'plan.md', 'readme.txt']);
+  });
+
+  it('keeps a nested folder hidden while its parent is collapsed', () => {
+    renderExpanded(new Set(['root/docs', 'root/docs/2026']));
+
+    expect(visibleNames()).toEqual(['root']);
+  });
+
+  it('reports the folder path on click and on Enter, without toggling itself', () => {
+    const toggled: string[] = [];
+    renderExpanded(new Set(['root']), (path) => toggled.push(path));
+
+    act(() => {
+      rowFor('docs').click();
+    });
+    act(() => {
+      rowFor('root').dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    });
+
+    expect(toggled).toEqual(['root/docs', 'root']);
+    expect(visibleNames()).toEqual(['root', 'docs', 'readme.txt']);
+  });
+
+  it('shows every folder as open when forceExpand is set, whatever expandedPaths holds', () => {
+    act(() => {
+      root.render(
+        <FileTree
+          node={tree}
+          selectedPath={null}
+          onSelect={() => {}}
+          expandedPaths={new Set()}
+          onToggle={() => {}}
+          forceExpand
+        />,
+      );
+    });
+
+    expect(visibleNames()).toEqual(['root', 'docs', '2026', 'plan.md', 'readme.txt']);
   });
 });
